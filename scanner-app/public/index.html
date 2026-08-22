@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lector de tickets</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <p class="eyebrow">REGISTRO DE DEDUCCIONES</p>
+        <h1>Escaneá tickets con la webcam</h1>
+        <p class="subtitle">Apuntá al QR de AFIP: al leerlo, se cargan fecha, CUIT, número e importe como en tu planilla.</p>
+      </header>
+
+      <section class="scanner-card" aria-labelledby="scanner-title">
+        <div class="card-heading">
+          <div>
+            <h2 id="scanner-title">Escáner</h2>
+            <p id="scanStatus" role="status">Listo para activar la cámara.</p>
+          </div>
+          <span id="cameraBadge" class="badge">Cámara apagada</span>
+        </div>
+        <div class="camera-area">
+          <video id="video" playsinline muted></video>
+          <div class="scanner-guide" aria-hidden="true"><span></span></div>
+          <div id="cameraEmpty" class="camera-empty">Apuntá la webcam al QR de AFIP del ticket.</div>
+        </div>
+        <div class="scanner-actions">
+          <button id="startCamera" class="primary">Activar cámara</button>
+          <button id="stopCamera" class="secondary" disabled>Detener</button>
+          <label class="camera-picker">Cámara<select id="cameraSelect" disabled><option value="">Detectando cámaras…</option></select></label>
+          <label class="switch"><input id="autoAdd" type="checkbox" checked /> Agregar automáticamente</label>
+        </div>
+        <p class="tip">La app activa foco continuo si tu cámara lo ofrece. Si se ve borroso, limpiá la lente y alejá el ticket 15–25 cm; algunas webcams no tienen autofoco. El código de barras de un producto no contiene los datos fiscales necesarios: buscá el QR de AFIP.</p>
+      </section>
+
+      <section class="entry-card" aria-labelledby="entry-title">
+        <div class="card-heading">
+          <div>
+            <h2 id="entry-title">Gasto detectado</h2>
+            <p>Podés ajustar cualquier dato antes de agregarlo.</p>
+          </div>
+          <span id="lastScan" class="muted">Sin lecturas todavía</span>
+        </div>
+        <form id="expenseForm">
+          <div class="fields">
+            <label>Fecha<input id="date" name="date" type="date" required /></label>
+            <label>Importe<input id="amount" name="amount" type="number" min="0" step="0.01" placeholder="0,00" required /></label>
+            <label>CUIT sin guiones<input id="cuit" name="cuit" inputmode="numeric" maxlength="11" required /></label>
+            <label>Nro. factura<input id="invoice" name="invoice" inputmode="numeric" maxlength="20" required /></label>
+            <label class="wide">Concepto<input id="concept" name="concept" list="concepts" value="GASTOS DE RESPRESENTACION" required /></label>
+            <datalist id="concepts">
+              <option value="GASTOS DE RESPRESENTACION"></option>
+              <option value="FARMACIA"></option>
+              <option value="ESPARCIMIENTO"></option>
+            </datalist>
+          </div>
+          <div class="form-actions"><button type="submit" class="primary">Agregar gasto</button><button id="clearForm" type="button" class="secondary">Limpiar</button></div>
+        </form>
+      </section>
+
+      <section class="records-card" aria-labelledby="records-title">
+        <div class="card-heading records-heading">
+          <div><h2 id="records-title">Gastos registrados</h2><p id="recordsSummary">0 gastos · $0,00</p></div>
+          <div class="export-controls"><label>Período<input id="period" type="month" /></label><button id="exportXlsx" class="primary" disabled>Descargar Excel</button></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Importe</th><th>CUIT</th><th>Nro. factura</th><th>Concepto</th><th></th></tr></thead>
+            <tbody id="recordsBody"><tr class="empty-row"><td colspan="6">Todavía no hay gastos registrados.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="/vendor/zxing-browser.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

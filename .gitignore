@@ -1,0 +1,59 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+dist/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Generated APKs / builds
+*.apk
+*.aab
+*.ipa
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local Excel / data files
+*.xlsx
+*.xls
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+
+# Local backups
+*.bak
+*.backup
+
+# Credentials / certificates
+*.pem
+*.key
+*.p12
+*.jks
+
+# Expo local state
+mobile-scanner/.expo/
