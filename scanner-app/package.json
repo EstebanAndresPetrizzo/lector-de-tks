@@ -1,0 +1,9 @@
+{
+  "name": "lector-tickets-server",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@tesseract.js-data/spa": "^1.0.0",
+    "tesseract.js": "^6.0.1"
+  }
+}

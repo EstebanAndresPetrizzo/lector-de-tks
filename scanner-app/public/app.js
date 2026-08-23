@@ -8,7 +8,7 @@ function isoToday() { return new Date().toLocaleDateString("en-CA"); }
 function currentMonth() { return new Date().toISOString().slice(0, 7); }
 function setStatus(message) { ui.status.textContent = message; }
 function beep() { try { const context = new AudioContext(); const oscillator = context.createOscillator(); const gain = context.createGain(); oscillator.frequency.value = 940; gain.gain.setValueAtTime(.055, context.currentTime); oscillator.connect(gain).connect(context.destination); oscillator.start(); oscillator.stop(context.currentTime + .09); } catch {} }
-function normalizeInvoice(pointOfSale, number) { return `${String(pointOfSale).padStart(4, "0")}${String(number).padStart(8, "0")}`; }
+function normalizeInvoice(pointOfSale, number) { return `${String(pointOfSale).padStart(5, "0")}${String(number).padStart(8, "0")}`; }
 
 function decodeBase64(value) {
   const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");

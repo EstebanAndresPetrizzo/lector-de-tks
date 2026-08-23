@@ -4,8 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { createWorker } from "tesseract.js";
+import { createRequire } from "node:module";
 
 const appDir = path.dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 const publicDir = path.join(appDir, "public");
 const templatePath = path.resolve(appDir, "..", "Registro Deducciones Diciembre 2025.xlsx");
 const exporterPath = path.join(appDir, "export_excel.py");
@@ -15,6 +18,7 @@ const port = Number(process.env.PORT ?? 4173);
 const host = process.env.HOST ?? "0.0.0.0";
 const mobileRecords = [];
 const mobileRecordKeys = new Set();
+let ocrWorkerPromise;
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -32,7 +36,7 @@ async function readJson(request) {
   let size = 0;
   for await (const chunk of request) {
     size += chunk.length;
-    if (size > 1_000_000) throw new Error("La solicitud es demasiado grande.");
+    if (size > 15_000_000) throw new Error("La solicitud es demasiado grande.");
     chunks.push(chunk);
   }
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
@@ -52,6 +56,38 @@ function cleanRecord(record) {
   if (!concept) throw new Error("Indicá el concepto de cada gasto.");
 
   return { date, cuit, invoice, amount, concept };
+}
+
+function parseOcrText(text) {
+  const normalized = text.replace(/\r/g, "").replace(/[|]/g, "1");
+  const dateMatch = normalized.match(/\b(\d{2})[\/-](\d{2})[\/-](\d{4})\b|\b(\d{4})[\/-](\d{2})[\/-](\d{2})\b/);
+  const cuitMatch = normalized.match(/(?:cuit|c\.u\.i\.t\.?)\s*[:\-]?\s*(\d[\d\s\-.]{9,16}\d)/i);
+  const amountMatch = normalized.match(/(?:total|importe|monto)\s*[:\-]?\s*\$?\s*([\d.]+(?:,\d{1,2})?)/i);
+  const invoiceMatch = normalized.match(/(?:n[roº°.]?|comprobante|factura)\s*[:\-]?\s*(\d{1,5})\s*[-/]\s*(\d{1,8})/i);
+  const draft = {};
+  if (dateMatch) draft.date = dateMatch[4] ? `${dateMatch[4]}-${dateMatch[5]}-${dateMatch[6]}` : `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}`;
+  if (cuitMatch) draft.cuit = cuitMatch[1].replace(/\D/g, "").slice(0, 11);
+  if (amountMatch) draft.amount = amountMatch[1];
+  if (invoiceMatch) {
+    draft.pointOfSale = invoiceMatch[1].replace(/\D/g, "");
+    draft.receiptNumber = invoiceMatch[2].replace(/\D/g, "");
+  }
+  return draft;
+}
+
+async function getOcrWorker() {
+  if (!ocrWorkerPromise) {
+    const langPath = require("@tesseract.js-data/spa").langPath;
+    ocrWorkerPromise = createWorker("spa", 1, { langPath });
+  }
+  return ocrWorkerPromise;
+}
+
+async function recognizeTicket(image) {
+  if (typeof image !== "string" || !/^[A-Za-z0-9+/]+=*$/.test(image)) throw new Error("La foto no tiene un formato válido.");
+  const worker = await getOcrWorker();
+  const result = await worker.recognize(Buffer.from(image, "base64"));
+  return parseOcrText(result.data.text);
 }
 
 function run(command, args) {
@@ -110,6 +146,12 @@ const server = http.createServer(async (request, response) => {
       mobileRecordKeys.add(key);
       mobileRecords.unshift({ ...record, receivedAt: new Date().toISOString() });
       return send(response, 201, JSON.stringify({ message: "Gasto recibido en la PC." }), { "Content-Type": "application/json; charset=utf-8" });
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/ocr") {
+      const body = await readJson(request);
+      const draft = await recognizeTicket(body.image);
+      return send(response, 200, JSON.stringify({ draft }), { "Content-Type": "application/json; charset=utf-8" });
     }
 
     if (request.method === "POST" && url.pathname === "/api/export") {

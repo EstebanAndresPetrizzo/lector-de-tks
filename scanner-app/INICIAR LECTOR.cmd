@@ -1,8 +1,10 @@
 @echo off
 setlocal
-set "NODE=C:\Users\Esteban Andres\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
-if not exist "%NODE%" (
-  echo No encontre el runtime de Node configurado para esta aplicacion.
+set "NODE="
+for %%I in (node.exe) do set "NODE=%%~$PATH:I"
+if not defined NODE (
+  echo No encontre Node.js en el PATH de esta computadora.
+  echo Instala Node.js o agrega node.exe al PATH y volve a intentar.
   pause
   exit /b 1
 )
