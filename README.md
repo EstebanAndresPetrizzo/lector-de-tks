@@ -20,7 +20,7 @@ La versión 2 usa una sola aplicación Python. No requiere Expo, Node ni una cá
 
 ## Instalación en Windows
 
-1. Instalá **Python 3.11 o posterior** y marcá `Add Python to PATH`.
+1. Instalá **Python 3.11, 3.12, 3.13 o 3.14** y marcá `Add Python to PATH`.
 2. Para leer tickets sin QR electrónico, instalá **Tesseract OCR**. Con `winget`:
 
    ```powershell
@@ -30,6 +30,8 @@ La versión 2 usa una sola aplicación Python. No requiere Expo, Node ni una cá
 3. Hacé doble clic en `INICIAR.cmd`.
 
 La primera ejecución crea un entorno aislado e instala las dependencias. Después se abre el navegador automáticamente.
+
+La instalación usa únicamente paquetes precompilados: no requiere Visual Studio, compiladores C ni herramientas de desarrollo adicionales.
 
 Cuando Windows pregunte por el acceso de red, elegí **Permitir acceso** únicamente para redes privadas. Esto permite abrir el lector desde el celular conectado al mismo Wi-Fi.
 

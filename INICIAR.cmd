@@ -25,7 +25,7 @@ if not exist ".venv\.dependencias-instaladas" (
   echo Instalando dependencias. Esto se hace una sola vez...
   ".venv\Scripts\python.exe" -m pip install --upgrade pip
   if errorlevel 1 goto :error
-  ".venv\Scripts\python.exe" -m pip install -r requirements.txt
+  ".venv\Scripts\python.exe" -m pip install --only-binary=:all: -r requirements.txt
   if errorlevel 1 goto :error
   type nul > ".venv\.dependencias-instaladas"
 )

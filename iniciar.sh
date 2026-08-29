@@ -8,7 +8,7 @@ fi
 
 if [ ! -f .venv/.dependencias-instaladas ]; then
   .venv/bin/python -m pip install --upgrade pip
-  .venv/bin/python -m pip install -r requirements.txt
+  .venv/bin/python -m pip install --only-binary=:all: -r requirements.txt
   touch .venv/.dependencias-instaladas
 fi
 
