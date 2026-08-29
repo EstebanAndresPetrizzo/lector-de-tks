@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lector de comprobantes</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DECLARACIÓN JURADA · PROCESAMIENTO LOCAL</p>
+          <h1>De los tickets al Excel, sin cargarlos uno por uno.</h1>
+          <p class="intro">Subí fotos o PDF desde la PC, o abrí esta misma pantalla en el celular para fotografiar comprobantes. Los datos no salen de tu red.</p>
+        </div>
+        <span id="ocrBadge" class="badge neutral">Verificando OCR…</span>
+      </header>
+
+      <section id="pinPanel" class="panel pin-panel" hidden>
+        <div>
+          <h2>Ingresá el PIN del lector</h2>
+          <p>Está visible en la ventana negra que abrió el programa en la PC.</p>
+        </div>
+        <form id="pinForm" class="inline-form">
+          <input id="pinInput" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required />
+          <button class="primary" type="submit">Entrar</button>
+        </form>
+      </section>
+
+      <main id="app" hidden>
+        <section class="panel upload-panel">
+          <div class="section-heading">
+            <div>
+              <p class="step">PASO 1</p>
+              <h2>Cargá todos los comprobantes juntos</h2>
+            <p>Admite JPG, JPEG, JFIF, PNG, WEBP, TIFF y PDF. Un PDF con varias páginas se procesa página por página.</p>
+            </div>
+            <label class="concept-control">
+              Concepto predeterminado
+              <input id="defaultConcept" list="concepts" value="GASTOS DE RESPRESENTACION" />
+              <datalist id="concepts">
+                <option value="GASTOS DE RESPRESENTACION"></option>
+                <option value="FARMACIA"></option>
+                <option value="ESPARCIMIENTO"></option>
+              </datalist>
+            </label>
+          </div>
+
+          <div id="dropZone" class="drop-zone">
+            <div class="upload-icon">↥</div>
+            <strong>Arrastrá una carpeta o varios archivos acá</strong>
+            <span>También podés usar los botones desde la PC o el celular.</span>
+            <div class="upload-actions">
+              <label class="primary file-button">Elegir fotos o PDF<input id="fileInput" type="file" accept="image/*,.pdf" multiple /></label>
+              <label class="secondary file-button desktop-only">Elegir carpeta<input id="folderInput" type="file" accept="image/*,.pdf" webkitdirectory multiple /></label>
+              <label class="secondary file-button mobile-only">Fotografiar ticket<input id="cameraInput" type="file" accept="image/*" capture="environment" /></label>
+            </div>
+          </div>
+
+          <div id="progressPanel" class="progress-panel" hidden>
+            <div class="progress-line"><span id="progressText">Preparando…</span><strong id="progressCount"></strong></div>
+            <div class="progress-track"><span id="progressBar"></span></div>
+          </div>
+          <p id="uploadMessage" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="stats" aria-label="Resumen">
+          <article><span>Comprobantes</span><strong id="recordCount">0</strong></article>
+          <article><span>Listos</span><strong id="readyCount">0</strong></article>
+          <article><span>Para revisar</span><strong id="reviewCount">0</strong></article>
+          <article><span>Importe total</span><strong id="totalAmount">$ 0,00</strong></article>
+        </section>
+
+        <section class="panel records-panel">
+          <div class="section-heading records-heading">
+            <div>
+              <p class="step">PASO 2</p>
+              <h2>Revisá solamente lo que quedó en duda</h2>
+              <p>Los campos amarillos necesitan atención. Podés corregirlos directamente en la tabla.</p>
+            </div>
+            <div class="filter-tabs" role="group" aria-label="Filtrar registros">
+              <button class="tab active" data-filter="all">Todos</button>
+              <button class="tab" data-filter="review">Para revisar</button>
+              <button class="tab" data-filter="ready">Listos</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Estado</th><th>Fecha</th><th>Importe</th><th>CUIT</th><th>Nro. factura</th><th>Concepto</th><th>Origen</th><th></th></tr>
+              </thead>
+              <tbody id="recordsBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state">Todavía no cargaste comprobantes.</div>
+          </div>
+        </section>
+
+        <section class="panel export-panel">
+          <div>
+            <p class="step">PASO 3</p>
+            <h2>Descargá el Excel terminado</h2>
+            <p>El archivo respeta fecha, importe, CUIT, número de factura y concepto; CUIT y factura se conservan completos, incluso con ceros iniciales.</p>
+          </div>
+          <div class="export-actions">
+            <label>Período<input id="period" type="month" /></label>
+            <button id="clearAll" class="danger-text" type="button">Vaciar lista</button>
+            <button id="exportButton" class="primary" type="button" disabled>Descargar Excel</button>
+          </div>
+        </section>
+
+        <section class="panel phone-panel">
+          <div>
+            <h2>Usarlo desde el celular</h2>
+            <p>Abrí una de estas direcciones en el teléfono conectado al mismo Wi‑Fi. El PIN ya está incluido.</p>
+          </div>
+          <div id="addressList" class="address-list"></div>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>
